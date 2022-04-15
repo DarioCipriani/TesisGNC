@@ -1,0 +1,41 @@
+server:
+  port: ${PORT:8080}
+
+logging:
+  level:
+    org:
+      atmosphere: warn
+
+# To improve the performance during development.
+# For more information https://vaadin.com/docs/flow/spring/tutorial-spring-configuration.html#special-configuration-parameters
+vaadin:
+  whitelisted-packages: com/vaadin,org/vaadin,com/gnc/mtask/application
+
+users:
+  #It is only set for the first time, after that everything is managed from the app
+  admin-password: GNCAdmin2021
+  admin-username: "GNC Admin"
+  admin-mail: admin@gncsolutions.net
+
+
+spring:
+  mustache:
+    check-template-location: false
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    hikari:
+      idle-timeout: 10000
+      maximum-pool-size: 5
+      minimum-idle: 1
+    password: Lucia358*/
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://localhost:3306/gnc_backend?allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+  jpa:
+    database: mysql
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
