@@ -172,6 +172,8 @@ public class UsersView extends Div {
 								if (!this.password.getValue().isEmpty()) {
 									user.setHashedPassword(passwordEncoder.encode(this.password.getValue()));
 								}
+								user.setUpdatedAt(new Date());
+
 								usersDetailsServiceImpl.updateUser(user);
 								popUp.close();
 								ViewUtils.notification("Updated user",
@@ -212,6 +214,9 @@ public class UsersView extends Div {
 						user.setUsername(this.email.getValue());
 						user.setRoles(this.userRoleSelect.getValue());
 						user.setHashedPassword(passwordEncoder.encode(this.password.getValue()));
+						user.setUpdatedAt(new Date());
+						user.setCreatedAt(new Date());
+
 						usersDetailsServiceImpl.updateUser(user);
 						popUp.close();
 						refreshGrid(usersDetailsServiceImpl);

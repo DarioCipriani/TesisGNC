@@ -3,6 +3,7 @@ package com.gnc.task.application.utilities;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -13,9 +14,7 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.EmailField;
-import com.vaadin.flow.component.textfield.PasswordField;
-import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.*;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.dom.Element;
 
@@ -77,7 +76,28 @@ public class ViewUtils {
         value.setWidthFull();
         return value;
     }
+    public static TextField newBasicConfigTextFieldUppercase(String name) {
+        TextField value = new TextField(name);
+        value.setClassName("uppercase");
+        value.setWidthFull();
+        return value;
+    }
+    public static IntegerField newBasicConfigIntegerField(String name) {
+        IntegerField value = new IntegerField(name);
+        value.setWidthFull();
+        return value;
+    }
+    public static BigDecimalField newBasicConfigBigDecimalField(String name) {
+        BigDecimalField value = new BigDecimalField(name);
+        value.setWidthFull();
+        return value;
+    }
 
+    public static ComboBox newBasicConfigComboBoxField(String name) {
+        ComboBox value = new ComboBox(name);
+        value.setWidthFull();
+        return value;
+    }
     public static PasswordField newBasicConfigPasswordField(String name) {
         PasswordField value = new PasswordField(name);
         value.setWidthFull();

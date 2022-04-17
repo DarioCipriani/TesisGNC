@@ -5,10 +5,14 @@ import com.gnc.task.application.data.entity.UserConfig;
 import com.gnc.task.application.data.service.UserConfigRepository;
 import com.gnc.task.application.security.AuthenticatedUser;
 import com.gnc.task.application.views.clientsconfig.ClientsConfigView;
+import com.gnc.task.application.views.fallasconfig.FailConfigView;
 import com.gnc.task.application.views.helloworld.HelloWorldView;
+import com.gnc.task.application.views.maintanceconfig.MaintanceConfigView;
+import com.gnc.task.application.views.productconfig.ProductConfigView;
 import com.gnc.task.application.views.public_.PublicView;
 import com.gnc.task.application.views.userprofile.UserProfileView;
 import com.gnc.task.application.views.users.UsersView;
+import com.gnc.task.application.views.vehicleconfig.VehicleConfigView;
 import com.vaadin.componentfactory.ToggleButton;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -17,6 +21,7 @@ import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -36,6 +41,7 @@ import java.util.Optional;
  * The main view is a top-level placeholder for other views.
  */
 @PageTitle("Main")
+@CssImport(value = "/themes/gncui/custom-textfield.css", themeFor = "vaadin-text-field")
 public class MainLayout extends AppLayout {
 
 	public static class MenuItemInfo {
@@ -165,11 +171,12 @@ public class MainLayout extends AppLayout {
 		MenuItemInfo[] menuItems = new MenuItemInfo[]{
 				new MenuItemInfo("Principal", "la la-file", PublicView.class),
 				new MenuItemInfo("Clientes", "la la-file", ClientsConfigView.class),
-				new MenuItemInfo("Vehículos", "la la-file", HelloWorldView.class),
-				new MenuItemInfo("Obleas y PH", "la la-file", HelloWorldView.class),
-				new MenuItemInfo("Mantenimientos", "la la-file", HelloWorldView.class),
-				new MenuItemInfo("Manual de Fallas", "la la-file",  HelloWorldView.class),
-				new MenuItemInfo("Productos", "la la-file",  HelloWorldView.class),
+				new MenuItemInfo("Vehículos", "la la-file", VehicleConfigView.class),
+				new MenuItemInfo("Obleas", "la la-file", HelloWorldView.class),
+				new MenuItemInfo("Pruebas Hidráulicas", "la la-file", HelloWorldView.class),
+				new MenuItemInfo("Mantenimientos", "la la-file", MaintanceConfigView.class),
+				new MenuItemInfo("Manual de Fallas", "la la-file",  FailConfigView.class),
+				new MenuItemInfo("Productos", "la la-file", ProductConfigView.class),
 				new MenuItemInfo("Presupuestos", "la la-file",  HelloWorldView.class),
 				new MenuItemInfo("Usuarios", "la la-key", UsersView.class)
 

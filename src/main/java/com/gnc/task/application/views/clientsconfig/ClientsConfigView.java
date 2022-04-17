@@ -1,5 +1,6 @@
 package com.gnc.task.application.views.clientsconfig;
 
+import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -212,16 +213,25 @@ public class ClientsConfigView extends HorizontalLayout {
 					client.setDireccion(direccion.getValue());
 					client.setTelefono(telefono.getValue());
 					client.setEmail(email.getValue());
+					client.setUpdatedAt(new Date());
 
-					clientsService.updateClient(client);
-					popUp.close();
-					ViewUtils
-							.notification("Cliente Actualizado",
-									"<b>Nombre:</b> " + client.getNombre().concat(" ").concat(client.getApellido())
-											+ "</br>",
-									NotificationVariant.LUMO_SUCCESS, Notification.Position.MIDDLE)
-							.open();
-					refreshGrid(clientDetailsServiceImpl);
+					try{
+						clientsService.updateClient(client);
+						popUp.close();
+						ViewUtils
+								.notification("Cliente Actualizado",
+										"<b>Nombre:</b> " + client.getNombre().concat(" ").concat(client.getApellido())
+												+ "</br>",
+										NotificationVariant.LUMO_SUCCESS, Notification.Position.MIDDLE)
+								.open();
+						refreshGrid(clientDetailsServiceImpl);
+					}catch (Exception exception){
+						ViewUtils
+								.notification("Cliente No Actualizado",
+										"<b>Causa:</b> " + exception.getCause() + "</br>",
+										NotificationVariant.LUMO_ERROR, Notification.Position.MIDDLE)
+								.open();
+					}
 
 				} else {
 					LOGGER.error("El Cliente no existe o hay un problema para obtener sus datos");
@@ -239,19 +249,30 @@ public class ClientsConfigView extends HorizontalLayout {
 					client.setDireccion(direccion.getValue());
 					client.setTelefono(telefono.getValue());
 					client.setEmail(email.getValue());
+					client.setCreatedAt(new Date());
+					client.setUpdatedAt(new Date());
 
-					clientsService.updateClient(client);
-					popUp.close();
-					refreshGrid(clientDetailsServiceImpl);
-					ViewUtils
-							.notification("Cliente creado",
-									"<b>Cliente:</b> " + client.getNombre().concat(" ").concat(client.getApellido())
-											+ "</br>",
-									NotificationVariant.LUMO_SUCCESS, Notification.Position.MIDDLE)
-							.open();
+					try{
+						clientsService.updateClient(client);
+						popUp.close();
+						refreshGrid(clientDetailsServiceImpl);
+						ViewUtils
+								.notification("Cliente creado",
+										"<b>Cliente:</b> " + client.getNombre().concat(" ").concat(client.getApellido())
+												+ "</br>",
+										NotificationVariant.LUMO_SUCCESS, Notification.Position.MIDDLE)
+								.open();
+					}catch (Exception exception){
+						ViewUtils
+								.notification("Cliente No creado",
+										"<b>Causa:</b> " + exception.getCause() + "</br>",
+										NotificationVariant.LUMO_ERROR, Notification.Position.MIDDLE)
+								.open();
+					}
+
 				} else
-					ViewUtils.notification("Puto Algo esta mal",
-							"El cliente no puede ser cargado, intente refrescando la pagina y volviendo a realizar los cambios, si el error continúa, consulte con el administrador. </br>",
+					ViewUtils.notification("Algo esta mal",
+							"El cliente no puede ser cargado, intente refrescando la página y volviendo a realizar los cambios, si el error continúa, consulte con el administrador. </br>",
 							NotificationVariant.LUMO_ERROR, Notification.Position.MIDDLE).open();
 			}
 
@@ -382,7 +403,7 @@ public class ClientsConfigView extends HorizontalLayout {
 				.addFilter(client -> StringUtils.containsIgnoreCase(client.getApellido(), apellidoFilter.getValue())));
 
 		TextField dniFilter = ViewUtils.createNewFilterForColumnGrid();
-		apellidoFilter.addValueChangeListener(event -> dataProvider
+		dniFilter.addValueChangeListener(event -> dataProvider
 				.addFilter(client -> StringUtils.containsIgnoreCase(client.getDni(), dniFilter.getValue())));
 
 		ViewUtils.setFilterInColumnGrid(filterRow, apellidoFilter, clientsGrid.getColumnByKey("Apellido"));

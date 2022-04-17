@@ -1,4 +1,4 @@
-package com.gnc.task.application.data.service;
+package com.gnc.task.application.data.repository;
 
 import com.gnc.task.application.data.entity.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;
