@@ -4,6 +4,8 @@ import com.gnc.task.application.data.AbstractEntity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "client_config")
@@ -17,6 +19,8 @@ public class Cliente extends AbstractEntity implements Serializable {
 	private String direccion;
 	private String email;
 	private String telefono;
+	@ManyToMany
+	private List<Vehiculo> vehiculos = new ArrayList<>();
 
 	public Cliente() {
 	}
@@ -67,5 +71,13 @@ public class Cliente extends AbstractEntity implements Serializable {
 
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
+	}
+
+	public List<Vehiculo> getVehiculos() {
+		return vehiculos;
+	}
+
+	public void setVehiculos(List<Vehiculo> vehiculos) {
+		this.vehiculos = vehiculos;
 	}
 }

@@ -39,7 +39,6 @@ public class ClientsService extends CrudService<Cliente, Integer> {
     public Cliente getClientByDni(String dni) {
         return repository.findByDni(dni);
     }
-
     public Cliente updateClient(Cliente client) {
         return repository.save(client);
     }

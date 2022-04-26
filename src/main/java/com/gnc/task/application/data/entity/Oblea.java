@@ -6,7 +6,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.util.Date;
 
 @Entity
 @Table(name = "oblea_config")
@@ -15,8 +14,8 @@ public class Oblea extends AbstractEntity implements Serializable {
 
 	@Column(unique = true)
 	private String numeroDeOblea;
-	private Date fechaVencimiento;
-	private Boolean obleaVigente;
+	private String fechaVencimiento;
+	private String obleaVigente;
 
 	public Oblea() {
 	}
@@ -29,19 +28,18 @@ public class Oblea extends AbstractEntity implements Serializable {
 		this.numeroDeOblea = numeroDeOblea;
 	}
 
-	public Date getFechaVencimiento() {
+	public String getFechaVencimiento() {
 		return fechaVencimiento;
 	}
 
-	public void setFechaVencimiento(Date fechaVencimiento) {
+	public void setFechaVencimiento(String fechaVencimiento) {
 		this.fechaVencimiento = fechaVencimiento;
 	}
 
-	public Boolean getObleaVigente() {
+	public String getObleaVigente() {
 		return obleaVigente;
 	}
 
-	public void setObleaVigente(Boolean obleaVigente) {
-		this.obleaVigente = obleaVigente;
+	public void setObleaVigente(String obleaVigente) { this.obleaVigente = obleaVigente;
 	}
 }
