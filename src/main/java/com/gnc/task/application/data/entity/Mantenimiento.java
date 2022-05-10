@@ -3,10 +3,7 @@ package com.gnc.task.application.data.entity;
 import com.gnc.task.application.data.AbstractEntity;
 import com.gnc.task.application.data.TMantenimiento;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -16,6 +13,7 @@ public class Mantenimiento extends AbstractEntity implements Serializable {
 
 
 	private TMantenimiento tipoMantenimiento;
+	@Lob
 	private String descripcion;
 	@ManyToOne(optional = false)
 	private Vehiculo vehiculo;

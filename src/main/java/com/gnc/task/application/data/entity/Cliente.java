@@ -19,7 +19,7 @@ public class Cliente extends AbstractEntity implements Serializable {
 	private String direccion;
 	private String email;
 	private String telefono;
-	@ManyToMany
+	@OneToMany(fetch = FetchType.EAGER)
 	private List<Vehiculo> vehiculos = new ArrayList<>();
 
 	public Cliente() {

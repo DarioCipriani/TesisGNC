@@ -4,6 +4,7 @@ import com.gnc.task.application.data.AbstractEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -16,6 +17,7 @@ public class Producto extends AbstractEntity implements Serializable {
 	@Column(unique = true)
 	private String codigo;
 	private String nombre;
+	@Lob
 	private String descripcion;
 	private int cantidad;
 	private BigDecimal precio;

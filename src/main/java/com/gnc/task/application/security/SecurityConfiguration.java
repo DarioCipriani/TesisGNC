@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import com.gnc.task.application.ui.views.login.LoginView;
+import com.gnc.task.application.views.login.LoginView;
 
 @EnableWebSecurity
 @Configuration

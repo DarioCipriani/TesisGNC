@@ -4,6 +4,7 @@ import com.gnc.task.application.data.AbstractEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import java.io.Serializable;
 
@@ -17,7 +18,9 @@ public class Falla extends AbstractEntity implements Serializable {
 	private String marcaVehiculo;
 	private String modeloVehiculo;
 	private String añoVehiculo;
+	@Lob //descripcionFalla soporta un string largo
 	private String descripcionFalla;
+	@Lob
 	private String descripcionSolucion;
 
 	public Falla() {
