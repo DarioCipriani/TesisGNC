@@ -2,14 +2,8 @@ package com.gnc.task.application.data.entity;
 
 import com.gnc.task.application.data.AbstractEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "vehiculo_config")
@@ -22,9 +16,8 @@ public class Vehiculo extends AbstractEntity implements Serializable {
 	private String modelo;
 	private Integer kilometro;
 	private String año;
-
-	@ManyToMany
-	private List<Cliente> clientes = new ArrayList<>();
+	@OneToOne(fetch = FetchType.EAGER)
+	private Cliente cliente;
 
 	public Vehiculo() {
 	}
@@ -69,16 +62,11 @@ public class Vehiculo extends AbstractEntity implements Serializable {
 		this.año = año;
 	}
 
-	@Override
-	public String toString() {
-		return dominio;
+	public Cliente getCliente() {
+		return cliente;
 	}
 
-	public List<Cliente> getClientes() {
-		return clientes;
-	}
-
-	public void setClientes(List<Cliente> clientes) {
-		this.clientes = clientes;
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}
 }

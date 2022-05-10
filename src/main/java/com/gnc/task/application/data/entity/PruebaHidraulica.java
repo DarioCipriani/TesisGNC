@@ -4,6 +4,7 @@ import com.gnc.task.application.data.AbstractEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -16,6 +17,7 @@ public class PruebaHidraulica extends AbstractEntity implements Serializable {
 	@Column(unique = true)
 	private String numeroCertificado;
 	private String pasoPrueba;
+	@Lob
 	private String descripcion;
 	private String fechaVencimientoPH;
 
