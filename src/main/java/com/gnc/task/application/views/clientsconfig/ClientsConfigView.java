@@ -133,7 +133,7 @@ public class ClientsConfigView extends HorizontalLayout {
 	private ClientDetailsServiceImpl clientDetailsServiceImpl;
 
 	public ClientsConfigView(AuthenticatedUser authenticatedUser, ClientsService clientsService,
-			ClientDetailsServiceImpl clientDetailsServiceImpl, VehicleService vehicleService) {
+							 ClientDetailsServiceImpl clientDetailsServiceImpl, VehicleService vehicleService) {
 		this.authenticatedUser = authenticatedUser;
 		this.clientsService = clientsService;
 		this.vehicleService = vehicleService;
@@ -400,7 +400,7 @@ public class ClientsConfigView extends HorizontalLayout {
 										.open();
 							}
 						}, "Cancelar", cancelEvent -> {
-						});
+				});
 				dialog.setConfirmButtonTheme(NotificationVariant.LUMO_ERROR.getVariantName());
 				dialog.open();
 			}
