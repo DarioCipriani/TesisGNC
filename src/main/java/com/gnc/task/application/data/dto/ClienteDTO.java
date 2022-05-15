@@ -2,6 +2,7 @@ package com.gnc.task.application.data.dto;
 
 import com.vaadin.flow.component.textfield.TextField;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClienteDTO {
@@ -12,7 +13,7 @@ public class ClienteDTO {
     private String direccion;
     private String telefono;
     private String email;
-    private List<VehiculoDTO> vehiculoDTOS;
+    private List<VehiculoDTO> vehiculoDTOS= new ArrayList<>();
 
     public ClienteDTO() {
     }

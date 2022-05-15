@@ -1,7 +1,6 @@
 package com.gnc.task.application.views.clientsconfig;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
 
@@ -11,9 +10,8 @@ import com.gnc.task.application.data.entity.Vehiculo;
 import com.gnc.task.application.data.service.VehicleService;
 import com.gnc.task.application.utilities.ClientUtils;
 import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.data.provider.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,9 +85,9 @@ public class ClientsConfigView extends HorizontalLayout {
 	private final Button deleteDataButton = new Button(deleteData);
 
 	//pop up cliente
-	private final Dialog popUp = new Dialog();
+	private Dialog popUp;
 	//pop up vehiculo
-	private final Dialog popUpData = new Dialog();
+	private Dialog popUpData;
 
 	// creacion de botones para la ventana de creacion de cliente
 	private final Button saveButton = new Button(GUARDAR, check);
@@ -138,226 +136,275 @@ public class ClientsConfigView extends HorizontalLayout {
 		this.clientsService = clientsService;
 		this.vehicleService = vehicleService;
 		this.clientDetailsServiceImpl = clientDetailsServiceImpl;
+
 		Optional<User> userLogged = authenticatedUser.get();
 		if (userLogged.isPresent() && userLogged.get().getRoles().contains(Role.ADMIN)) {
 			setSizeFull();
-			popUp.setResizable(true);
-			popUp.setCloseOnOutsideClick(false);
-			popUp.setCloseOnEsc(true);
-			popUp.setSizeFull();
-
-			popUpData.setResizable(true);
-			popUp.setCloseOnOutsideClick(false);
-			popUp.setCloseOnEsc(true);
-
-			close.setColor("#BE2123");
-			closeData.setColor("#BE2123");
-			details.setVisible(false);
-			ViewUtils.setButtonAutoMarginAndVariant(saveButton, ButtonVariant.LUMO_TERTIARY);
-			ViewUtils.setButtonAutoMarginAndVariant(cancelButton, ButtonVariant.LUMO_ERROR);
-			ViewUtils.setButtonAutoMarginAndVariant(saveData, ButtonVariant.LUMO_TERTIARY);
-			ViewUtils.setButtonAutoMarginAndVariant(cancelData, ButtonVariant.LUMO_ERROR);
-
-			//botones de clientes
-			refreshButton.getElement().setProperty("title", "Recargar Clientes");
-			addButton.getElement().setProperty("title", "Agregar Nuevo Cliente");
-			editButton.getElement().setProperty("title", "Editar Cliente");
-			deleteButton.getElement().setProperty("title", "Borrar Cliente");
-			//botones de vehiculos
-			refreshDataButton.getElement().setProperty("title", "Recargar Vehículos");
-			addDataButton.getElement().setProperty("title", "Agregar Nuevo Vehículo");
-			editDataButton.getElement().setProperty("title", "Editar  Vehículo");
-			deleteDataButton.getElement().setProperty("title", "Borrar Vehículo");
-
-			//formulario popUp cliente
-			FormLayout formPopUp = new FormLayout();
-			formPopUp.setResponsiveSteps(
-					new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP),
-					new FormLayout.ResponsiveStep("600px", 1, FormLayout.ResponsiveStep.LabelsPosition.ASIDE));
-			formPopUp.setSizeFull();
-			formPopUp.setId("form-pop-up-cliente");
-			H2 headline = new H2("");
-			headline.getStyle().set("margin-top", "0");
-			//cliente
-			nombre = ViewUtils.newBasicConfigTextField("Nombre");
-			apellido = ViewUtils.newBasicConfigTextField("Apellido");
-			dni = ViewUtils.newBasicConfigTextField("DNI");
-			direccion = ViewUtils.newBasicConfigTextField("Dirección");
-			telefono = ViewUtils.newBasicConfigTextField("Teléfono");
-			email = ViewUtils.newBasicConfigTextField("Email");
-			formPopUp.add(headline, nombre, apellido, dni, direccion, telefono, email);
-			cancelButton.setWidthFull();
-			saveButton.setWidthFull();
-
-			buttonDiv = new HorizontalLayout();
-			buttonDiv.setId("button-layout");
-			buttonDiv.setSizeFull();
-			buttonDiv.add(saveButton, cancelButton);
-			buttonDiv.setAlignItems(Alignment.CENTER);
-			buttonDiv.setVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-			formPopUp.add(buttonDiv);
-			popUp.setResizable(true);
-			popUp.add(formPopUp);
-
-			//formulario popUp vehiculo
-			FormLayout editorDiv = new FormLayout();
-			editorDiv.setResponsiveSteps(
-					new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP),
-					new FormLayout.ResponsiveStep("600px", 1, FormLayout.ResponsiveStep.LabelsPosition.ASIDE));
-			editorDiv.setSizeFull();
-			editorDiv.setId("form-pop-up-cliente");
-			H2 headlineV = new H2("");
-			headline.getStyle().set("margin-top", "0");
-			//vehiculo
-			dominio = ViewUtils.newBasicConfigTextField("Dominio");
-			marca = ViewUtils.newBasicConfigTextField("Marca");
-			modelo = ViewUtils.newBasicConfigTextField("Modelo");
-			kilometro = ViewUtils.newBasicConfigIntegerField("Kilometraje");
-			año = ViewUtils.newBasicConfigTextField("Año");
-			editorDiv.add(headlineV, dominio, marca, modelo, kilometro, año);
-			cancelData.setWidthFull();
-			saveData.setWidthFull();
-
-			HorizontalLayout buttonDiv = new HorizontalLayout();
-			buttonDiv.setId("button-layout");
-			buttonDiv.setSizeFull();
-			buttonDiv.add(cancelData, saveData);
-			buttonDiv.setAlignItems(FlexComponent.Alignment.CENTER);
-			buttonDiv.setVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-			popUpData.add(editorDiv);
-			popUpData.setResizable(true);
-			popUpData.add(formPopUp);
-
-			//limpiar formulario cliente
-			nombre.clear();
-			apellido.clear();
-			dni.clear();
-			direccion.clear();
-			telefono.clear();
-			email.clear();
-
-			//limpiar formulario vehiculo
-			dominio.clear();
-			marca.clear();
-			modelo.clear();
-			kilometro.clear();
-			año.clear();
-
-			// creacion de la fila (Grid) con el encabezado con cada uno de los campos de Cliente
-			clientsGrid.setSizeFull();
-			clientsGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
-			clientsGrid.addThemeName("grid-selection-theme");
-			clientsGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.MATERIAL_COLUMN_DIVIDERS);
-
-			clientsGrid.addColumn(ClienteDTO::getNombre).setHeader("Nombre").setResizable(true).setKey("name")
-					.setSortable(true);
-			clientsGrid.addColumn(ClienteDTO::getApellido).setHeader("Apellido").setResizable(true).setKey("Apellido")
-					.setSortable(true);
-			clientsGrid.addColumn(ClienteDTO::getDni).setHeader("DNI").setResizable(true).setKey("dni").setSortable(true);
-			clientsGrid.addColumn(ClienteDTO::getTelefono).setHeader("Teléfono").setResizable(true).setKey("telefono")
-					.setSortable(true);
-			clientsGrid.addColumn(ClienteDTO::getDireccion).setHeader("Dirección").setResizable(true).setKey("direccion")
-					.setSortable(true);
-			clientsGrid.addColumn(ClienteDTO::getEmail).setHeader("Email").setResizable(true).setKey("email")
-					.setSortable(true);
-
-			// creacion de la fila (Grid) con el encabezado con cada uno de los campos de Cliente
-			vehiculoGrid.setSizeFull();
-			vehiculoGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
-			vehiculoGrid.addThemeName("grid-selection-theme");
-			vehiculoGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.MATERIAL_COLUMN_DIVIDERS);
-
-			vehiculoGrid.addColumn(VehiculoDTO::getDominio).setHeader("Dominio").setResizable(true).setKey("dominio")
-					.setSortable(true);
-			vehiculoGrid.addColumn(VehiculoDTO::getMarca).setHeader("Marca").setResizable(true).setKey("marca")
-					.setSortable(true);
-			vehiculoGrid.addColumn(VehiculoDTO::getModelo).setHeader("Modelo").setResizable(true).setKey("modelo").setSortable(true);
-			vehiculoGrid.addColumn(VehiculoDTO::getKilometro).setHeader("Kilómetros").setResizable(true).setKey("kilometros")
-					.setSortable(true);
-			vehiculoGrid.addColumn(VehiculoDTO::getAño).setHeader("Año").setResizable(true).setKey("año")
-					.setSortable(true);
-
-
-			Div buttons = new Div();
-			buttons.setId("div-buttons");
-			buttons.setHeight("5%");
-			buttons.add(refreshButton, addButton, editButton, deleteButton);
-
+			//crearPopUpCliente();
+			//crearPopUpVehiculo();
+			//details.setVisible(false);
 			VerticalLayout verticalLayout = new VerticalLayout();
 			verticalLayout.setSizeFull();
-			verticalLayout.add(buttons);
-			verticalLayout.add(clientsGrid);
+			
+			createButtonLayoutCliente(verticalLayout);
+			createButtonLayoutVehiculo();
+			//crear popUps
+			//formPopUpCliente("");
+			//formPopUpVehiculo("");
 
+			//limpia popUps
+			//limpiarFormCliente();
+			//limpiarFormVehiculo();
+			//crea estructura de los grids
+			crearGridCliente(verticalLayout);
+			crearGridVehiculo();
 
-			Div wrapper = new Div();
-			wrapper.setId("grid-wrapper");
-			wrapper.setSizeFull();
-			verticalLayout.add(wrapper);
+			agregarSeccionVehiculo(verticalLayout);
 
+			cargarClienteGrid(clientsService);
+			cargarVehiculoGrid();
 
-			Div layout = new Div();
-			layout.setId("div-layout");
-			layout.setWidthFull();
-			layout.setSizeFull();
-			layout.setHeight("45%");
-			layout.add(vehiculoGrid);
-			Div buttonsData = new Div();
-			buttonsData.setId("div-buttons");
-			buttonsData.setWidthFull();
-			buttonsData.setHeight("15%");
-			buttonsData.add(refreshDataButton, addDataButton, editDataButton, deleteDataButton);
-			wrapper.add(buttonsData,layout);
-			verticalLayout.add(wrapper);
-			add(verticalLayout);
-
-			List<ClienteDTO> clientesClienteDTOList = ClientUtils.getAllClients(clientsService);
-			dataClienteProvider = new ListDataProvider<>(clientesClienteDTOList);
-			clientsGrid.setDataProvider(dataClienteProvider);
-			clientsGrid.getDataProvider().refreshAll();
-			clientsGrid.select(null);
-			dataClienteProvider.refreshAll();
-
-			clientsGrid.asSingleSelect().addValueChangeListener(event -> {
-				ClienteDTO cli = event.getValue();
-				if (cli != null) {
-					details.setSummaryText(
-							"Vehiculos del cliente: " + cli.getNombre() + " - " + cli.getApellido());
-					details.addOpenedChangeListener(e -> details.addContent(vehiculoGrid));
-					details.setOpened(true);
-					details.setVisible(true);
-
-					try {
-						refreshGridVehiculo(cli);
-					} catch (Exception e) {
-						LOGGER.error("Could not get results for the vehiculo , ERROR: {}", e.getMessage());
-						vehiculoGrid.setDataProvider(new ListDataProvider<>(new ArrayList<>()));
-					}
-					refreshDataButton.click();
-					saveButton.setText(GUARDAR);
-				} else {
-					details.setOpened(false);
-					details.setVisible(false);
-				}
-			});
-
-			//Cada vez que se selecciona un elemento de la grilla si el evento no tiene valor (por ejemplo el Crear
-			// Vehiculo) entonces seteamos el boton de guardar con el texto "Nuevo Vehiculo", mientras que si el evento
-			// tiene valor (por ejemplo el Modificar Vehiculo) entonces seteamos el boton con el texto "Guardar"
-			vehiculoGrid.asSingleSelect().addValueChangeListener(event -> {
-				if (event.getValue() != null) {
-					saveButton.setText(GUARDAR);
-				} else {
-					vehiculoGrid.getDataProvider().refreshAll();
-					saveButton.setText(NEW_VEHICULO);
-				}
-			});
-			addButtonListeners();
 			addFiltersToGrid();
-			ViewUtils.gridReziseColumns(clientsGrid);
-			ViewUtils.gridReziseColumns(vehiculoGrid);
+
+			agregarFuncionBoton();
+
+
+
 		}
 
 	}
+
+	private void agregarSeccionVehiculo(VerticalLayout verticalLayout) {
+		Div wrapper = new Div();
+		wrapper.setId("grid-wrapper");
+		H4 headline = new H4("Vehículo/s:");
+		headline.getStyle().set("margin-top", "0");
+		wrapper.setSizeFull();
+		wrapper.add(headline);
+		verticalLayout.add(wrapper);
+		Div layout = new Div();
+		layout.setId("div-layout");
+		layout.setWidthFull();
+		layout.setSizeFull();
+		layout.setHeight("45%");
+		layout.add(vehiculoGrid);
+		Div buttonsData = new Div();
+		buttonsData.setId("div-buttons");
+		buttonsData.setWidthFull();
+		buttonsData.setHeight("15%");
+		buttonsData.add(refreshDataButton, addDataButton, editDataButton, deleteDataButton);
+		wrapper.add(buttonsData,layout);
+		verticalLayout.add(wrapper);
+		add(verticalLayout);
+	}
+
+	private void cargarVehiculoGrid() {
+		//Cada vez que se selecciona un elemento de la grilla si el evento no tiene valor (por ejemplo el Crear
+		// Vehiculo) entonces seteamos el boton de guardar con el texto "Nuevo Vehiculo", mientras que si el evento
+		// tiene valor (por ejemplo el Modificar Vehiculo) entonces seteamos el boton con el texto "Guardar"
+		vehiculoGrid.asSingleSelect().addValueChangeListener(event -> {
+			if (event.getValue() != null) {
+				saveButton.setText(GUARDAR);
+			} else {
+				vehiculoGrid.getDataProvider().refreshAll();
+				saveButton.setText(NEW_VEHICULO);
+			}
+		});
+		ViewUtils.gridReziseColumns(vehiculoGrid);
+	}
+
+	private void cargarClienteGrid(ClientsService clientsService) {
+		List<ClienteDTO> clientesClienteDTOList = ClientUtils.getAllClients(clientsService);
+		dataClienteProvider = new ListDataProvider<>(clientesClienteDTOList);
+		clientsGrid.setDataProvider(dataClienteProvider);
+		clientsGrid.getDataProvider().refreshAll();
+		clientsGrid.select(null);
+		dataClienteProvider.refreshAll();
+
+		clientsGrid.asSingleSelect().addValueChangeListener(event -> {
+			ClienteDTO cli = event.getValue();
+			if (cli != null) {
+				details.setSummaryText(
+						"Vehiculos del cliente: " + cli.getNombre() + " - " + cli.getApellido());
+				details.addOpenedChangeListener(e -> details.addContent(vehiculoGrid));
+				details.setOpened(true);
+				details.setVisible(true);
+
+				try {
+					refreshGridVehiculo(cli);
+				} catch (Exception e) {
+					LOGGER.error("Could not get results for the vehiculo , ERROR: {}", e.getMessage());
+					vehiculoGrid.setDataProvider(new ListDataProvider<>(new ArrayList<>()));
+				}
+				refreshDataButton.click();
+				saveButton.setText(GUARDAR);
+			} else {
+				details.setOpened(false);
+				details.setVisible(false);
+			}
+		});
+		ViewUtils.gridReziseColumns(clientsGrid);
+	}
+
+	private void crearGridVehiculo() {
+		// creacion de la fila (Grid) con el encabezado con cada uno de los campos de Cliente
+		vehiculoGrid.setSizeFull();
+		vehiculoGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+		vehiculoGrid.addThemeName("grid-selection-theme");
+		vehiculoGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.MATERIAL_COLUMN_DIVIDERS);
+
+		vehiculoGrid.addColumn(VehiculoDTO::getDominio).setHeader("Dominio").setResizable(true).setKey("dominio")
+				.setSortable(true);
+		vehiculoGrid.addColumn(VehiculoDTO::getMarca).setHeader("Marca").setResizable(true).setKey("marca")
+				.setSortable(true);
+		vehiculoGrid.addColumn(VehiculoDTO::getModelo).setHeader("Modelo").setResizable(true).setKey("modelo").setSortable(true);
+		vehiculoGrid.addColumn(VehiculoDTO::getKilometro).setHeader("Kilómetros").setResizable(true).setKey("kilometros")
+				.setSortable(true);
+		vehiculoGrid.addColumn(VehiculoDTO::getAño).setHeader("Año").setResizable(true).setKey("año")
+				.setSortable(true);
+	}
+
+	private void crearGridCliente(VerticalLayout verticalLayout) {
+		// creacion de la fila (Grid) con el encabezado con cada uno de los campos de Cliente
+		clientsGrid.setSizeFull();
+		clientsGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+		clientsGrid.addThemeName("grid-selection-theme");
+		clientsGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.MATERIAL_COLUMN_DIVIDERS);
+
+		clientsGrid.addColumn(ClienteDTO::getNombre).setHeader("Nombre").setResizable(true).setKey("name")
+				.setSortable(true);
+		clientsGrid.addColumn(ClienteDTO::getApellido).setHeader("Apellido").setResizable(true).setKey("Apellido")
+				.setSortable(true);
+		clientsGrid.addColumn(ClienteDTO::getDni).setHeader("DNI").setResizable(true).setKey("dni").setSortable(true);
+		clientsGrid.addColumn(ClienteDTO::getTelefono).setHeader("Teléfono").setResizable(true).setKey("telefono")
+				.setSortable(true);
+		clientsGrid.addColumn(ClienteDTO::getDireccion).setHeader("Dirección").setResizable(true).setKey("direccion")
+				.setSortable(true);
+		clientsGrid.addColumn(ClienteDTO::getEmail).setHeader("Email").setResizable(true).setKey("email")
+				.setSortable(true);
+		verticalLayout.add(clientsGrid);
+	}
+
+	private void limpiarFormVehiculo() {
+		//limpiar formulario vehiculo
+		dominio.clear();
+		marca.clear();
+		modelo.clear();
+		kilometro.clear();
+		año.clear();
+	}
+
+	private void limpiarFormCliente() {
+		//limpiar formulario cliente
+		nombre.clear();
+		apellido.clear();
+		dni.clear();
+		direccion.clear();
+		telefono.clear();
+		email.clear();
+	}
+
+	private void formPopUpVehiculo(String titulo) {
+		//formulario popUp vehiculo
+		FormLayout editorDiv = new FormLayout();
+		editorDiv.setResponsiveSteps(
+				new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP),
+				new FormLayout.ResponsiveStep("600px", 1, FormLayout.ResponsiveStep.LabelsPosition.ASIDE));
+		editorDiv.setSizeFull();
+		editorDiv.setId("form-pop-up-vehiculo");
+		H2 headlineV = new H2(titulo);
+		headlineV.getStyle().set("margin-top", "0");
+		//vehiculo
+		dominio = ViewUtils.newBasicConfigTextField("Dominio");
+		marca = ViewUtils.newBasicConfigTextField("Marca");
+		modelo = ViewUtils.newBasicConfigTextField("Modelo");
+		kilometro = ViewUtils.newBasicConfigIntegerField("Kilometraje");
+		año = ViewUtils.newBasicConfigTextField("Año");
+		editorDiv.add(headlineV, dominio, marca, modelo, kilometro, año);
+		seccionBotones(cancelData, saveData);
+		editorDiv.add(buttonDiv);
+		popUpData.add(editorDiv);
+	}
+
+	private void formPopUpCliente(String titulo) {
+		//formulario popUp cliente
+		FormLayout formPopUp = new FormLayout();
+		formPopUp.setResponsiveSteps(
+				new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP),
+				new FormLayout.ResponsiveStep("600px", 1, FormLayout.ResponsiveStep.LabelsPosition.ASIDE));
+		formPopUp.setSizeFull();
+		formPopUp.setId("form-pop-up-cliente");
+		H2 headline = new H2(titulo);
+		headline.getStyle().set("margin-top", "0");
+		//cliente
+		nombre = ViewUtils.newBasicConfigTextField("Nombre");
+		apellido = ViewUtils.newBasicConfigTextField("Apellido");
+		dni = ViewUtils.newBasicConfigTextField("DNI");
+		direccion = ViewUtils.newBasicConfigTextField("Dirección");
+		telefono = ViewUtils.newBasicConfigTextField("Teléfono");
+		email = ViewUtils.newBasicConfigTextField("Email");
+		formPopUp.add(headline, nombre, apellido, dni, direccion, telefono, email);
+		seccionBotones(cancelButton, saveButton);
+		formPopUp.add(buttonDiv);
+		popUp.add(formPopUp);
+		//popUp.setResizable(true);
+	}
+
+	/*Metodo encargado de crear la seccion de botones de los PopUp*/
+	private void seccionBotones(Button cancel, Button save) {
+		buttonDiv = new HorizontalLayout();
+		buttonDiv.setId("button-layout");
+		buttonDiv.setSizeFull();
+		cancel.setWidthFull();
+		save.setWidthFull();
+		buttonDiv.add(save, cancel);
+		buttonDiv.setAlignItems(Alignment.CENTER);
+		buttonDiv.setVerticalComponentAlignment(Alignment.CENTER);
+	}
+
+	private void createButtonLayoutVehiculo() {
+		closeData.setColor("#BE2123");
+		ViewUtils.setButtonAutoMarginAndVariant(saveData, ButtonVariant.LUMO_TERTIARY);
+		ViewUtils.setButtonAutoMarginAndVariant(cancelData, ButtonVariant.LUMO_ERROR);
+		//botones de vehiculos
+		refreshDataButton.getElement().setProperty("title", "Recargar Vehículos");
+		addDataButton.getElement().setProperty("title", "Agregar Nuevo Vehículo");
+		editDataButton.getElement().setProperty("title", "Editar  Vehículo");
+		deleteDataButton.getElement().setProperty("title", "Borrar Vehículo");
+	}
+
+	private void createButtonLayoutCliente(VerticalLayout verticalLayout) {
+		close.setColor("#BE2123");
+		ViewUtils.setButtonAutoMarginAndVariant(saveButton, ButtonVariant.LUMO_TERTIARY);
+		ViewUtils.setButtonAutoMarginAndVariant(cancelButton, ButtonVariant.LUMO_ERROR);
+		//botones de clientes
+		refreshButton.getElement().setProperty("title", "Recargar Clientes");
+		addButton.getElement().setProperty("title", "Agregar Nuevo Cliente");
+		editButton.getElement().setProperty("title", "Editar Cliente");
+		deleteButton.getElement().setProperty("title", "Borrar Cliente");
+		Div buttons = new Div();
+		buttons.setId("div-buttons");
+		buttons.setHeight("5%");
+		buttons.add(refreshButton, addButton, editButton, deleteButton);
+		verticalLayout.add(buttons);
+	}
+
+	/* Crea el PopUp cliente y le setea algunas propiedades */
+	private void crearPopUpCliente() {
+		popUp = new Dialog();
+		popUp.setResizable(true);
+		popUp.setCloseOnOutsideClick(false);
+		popUp.setCloseOnEsc(true);
+	}
+
+	/* Crea el PopUp vehiculo y le setea algunas propiedades */
+	private void crearPopUpVehiculo() {
+		popUpData = new Dialog();
+		popUpData.setResizable(true);
+		popUpData.setCloseOnOutsideClick(false);
+		popUpData.setCloseOnEsc(true);
+	}
+
 	/*Metodo encargado de crear el grid principal cuando se abre cada sub menu*/
 	private void createGridLayout(VerticalLayout layout) {
 		Div wrapper = new Div();
@@ -367,7 +414,7 @@ public class ClientsConfigView extends HorizontalLayout {
 		wrapper.add(clientsGrid);
 	}
 	/*Metodo encargado de decir a cada boton que es lo que tiene que hacer*/
-	private void addButtonListeners() {
+	private void agregarFuncionBoton() {
 		cancelButton.addClickListener(e -> {
 			refreshGrid();
 			popUp.close();
@@ -489,25 +536,19 @@ public class ClientsConfigView extends HorizontalLayout {
 		refreshButton.addClickListener(event -> refreshGrid());
 		//Es lo que hace el boton + (Nuevo)
 		addButton.addClickListener(event -> {
-			crearPopUp(popUp);
-			editor("Crear Cliente");
-			seccionBotones();
-			editorDiv.add(buttonDiv);
-			popUp.add(editorDiv);
+			crearPopUpCliente();
+			formPopUpCliente("Crear Cliente");
+			//limpia popUps
+			limpiarFormCliente();
 			clientsGrid.asSingleSelect().clear();
-			//limpiar formulario cliente
-			nombre.clear();
-			apellido.clear();
-			dni.clear();
-			direccion.clear();
-			telefono.clear();
-			email.clear();
 			saveButton.setText(NEW_CLIENT);
 			popUpOpened(popUp);
 		});
 
 		// Boton de editar
 		editButton.addClickListener(event -> {
+			crearPopUpCliente();
+			formPopUpCliente("Modificar Cliente");
 			ClienteDTO client = clientsGrid.asSingleSelect().getValue();
 			if (Objects.nonNull(client)) {
 				populateForm(client);
@@ -520,19 +561,25 @@ public class ClientsConfigView extends HorizontalLayout {
 						NotificationVariant.LUMO_PRIMARY, Notification.Position.MIDDLE).open();
 			}
 		});
+
 		//Botones de vehiculos
 		refreshDataButton.addClickListener(event -> {
 			ClienteDTO clienteDTO = clientsGrid.asSingleSelect().getValue();
 			refreshGridVehiculo(clienteDTO);
 		});
+
 		addDataButton.addClickListener(event -> {
 			ClienteDTO clienteDTO = clientsGrid.asSingleSelect().getValue();
 			if (clienteDTO != null) {
-				saveData.setText("Agregar Nuevo");
+				crearPopUpVehiculo();
+				formPopUpVehiculo("Crear Vehículo");
+				//limpia popUps
+				limpiarFormVehiculo();
+				saveData.setText(NEW_VEHICULO);
 				popUpOpened(popUpData);
 			} else {
-				ViewUtils.notification("Seleccionar vehículo",
-						"Usted debe seleccionar el cliente, luego el vehiculo y hacer click en el botón de eliminar si desea eliminar el vehiculo."
+				ViewUtils.notification("Seleccionar Cliente",
+						"Usted debe seleccionar el cliente para poder asignar un nuevo vehículo al cliente."
 								+ "</br>",
 						NotificationVariant.LUMO_PRIMARY, Notification.Position.MIDDLE).open();
 			}
@@ -577,7 +624,7 @@ public class ClientsConfigView extends HorizontalLayout {
 				if (Objects.nonNull(vehiculoDTO)) {
 					populateFormVehiculo(vehiculoDTO);
 					saveButton.setText(GUARDAR);
-					popUpOpened(popUpData);
+					crearPopUp(popUpData);
 				} else {
 					ViewUtils.notification("Seleccionar vehículo",
 							"Usted debe seleccionar el cliente, luego en el vehiculo y hacer click en el botón de editar si desea editar el vehiculo."
@@ -596,73 +643,37 @@ public class ClientsConfigView extends HorizontalLayout {
 			if (clienteDTO != null) {
 				Cliente c = clientsService.getClientByDni(clienteDTO.getDni());
 				VehiculoDTO vehiculoDTO =  vehiculoGrid.asSingleSelect().getValue();
+				Vehiculo v;
 				if (vehiculoDTO != null) {
-					if ("Save".equals(saveData.getText())) {
-						if (vehiculoDTO != null) {
-							vehiculoDTO.setDominio(dominio.getValue());
-							vehiculoDTO.setMarca(marca.getValue());
-							vehiculoDTO.setModelo(modelo.getValue());
-							vehiculoDTO.setAño(año.getValue());
-							vehiculoDTO.setKilometro(kilometro.getValue());
+					v = vehicleService.getVehiculoByByDominio(dominio.getValue());
+					vehiculoDTO.setMarca(marca.getValue());
+					vehiculoDTO.setModelo(modelo.getValue());
+					vehiculoDTO.setAño(año.getValue());
+					vehiculoDTO.setKilometro(kilometro.getValue());
 
-						} else {
-							ViewUtils.notification("Seleccionar Vehículo",
-									"Usted debe seleccionar el vehiculo y hacer click en el botón de editar si desea editar el vehiculo."
-											+ "</br>",
-									NotificationVariant.LUMO_PRIMARY, Notification.Position.MIDDLE).open();
-						}
-					} else {
-						vehiculoDTO = new VehiculoDTO();
-						vehiculoDTO.setDominio(dominio.getValue());
-						vehiculoDTO.setMarca(marca.getValue());
-						vehiculoDTO.setModelo(modelo.getValue());
-						vehiculoDTO.setAño(año.getValue());
-						vehiculoDTO.setKilometro(kilometro.getValue());
-						vehiculoDTO.setClienteId(clienteDTO.getId());
-						clienteDTO.getVehiculoDTOS().add(vehiculoDTO);
-					}
-					if (clienteDTO != null) {
-						try {
-							//actualicemos los datos del vehiculo
-							Vehiculo v = vehicleService.getVehiculoByByDominio(vehiculoDTO.getDominio());
-							if (v != null) {
-								v.setDominio(dominio.getValue());
-								v.setMarca(marca.getValue());
-								v.setModelo(modelo.getValue());
-								v.setAño(año.getValue());
-								v.setKilometro(kilometro.getValue());
-							}else{
-								v = new Vehiculo();
-								v.setDominio(dominio.getValue());
-								v.setMarca(marca.getValue());
-								v.setModelo(modelo.getValue());
-								v.setAño(año.getValue());
-								v.setKilometro(kilometro.getValue());
-								v.setCliente(c);
-								c.getVehiculos().add(v);
-							}
-							vehicleService.updateVehiculo(v);
 
-						} catch (Exception e) {
-							LOGGER.error("ERROR cuando actualiza/crea vehiculo: {}", e.getMessage());
-							e.printStackTrace();
-							ViewUtils.notification("Algo esta mal",
-									"El vehiculo no puede ser cargado, intente refrescando la pagina y volviendo a realizar los cambios, si el error continúa, consulte con el administrador. </br>",
-									NotificationVariant.LUMO_ERROR, Notification.Position.MIDDLE).open();
-						}
-					}
-					refreshButton.click();
-					refreshGrid();
-					vehiculoGrid.setDataProvider(new ListDataProvider<>(new ArrayList<>()));
-					vehiculoGrid.getDataProvider().refreshAll();
-					vehiculoGrid.select(null);
-					dataVehiculoProvider.refreshAll();
-				}else {
-					ViewUtils.notification("Seleccionar Vehículo",
-							"Debes seleccionar un cliente y luego hacer click en el vehiculo para poder editarlo."
-									+ "</br>",
-							NotificationVariant.LUMO_PRIMARY, Notification.Position.MIDDLE).open();
+				} else {
+					vehiculoDTO = new VehiculoDTO();
+					vehiculoDTO.setDominio(dominio.getValue());
+					vehiculoDTO.setMarca(marca.getValue());
+					vehiculoDTO.setModelo(modelo.getValue());
+					vehiculoDTO.setAño(año.getValue());
+					vehiculoDTO.setKilometro(kilometro.getValue());
+					vehiculoDTO.setClienteId(clienteDTO.getId());
+					clienteDTO.getVehiculoDTOS().add(vehiculoDTO);
+					v = new Vehiculo();
+					v.setDominio(dominio.getValue());
+					v.setMarca(marca.getValue());
+					v.setModelo(modelo.getValue());
+					v.setAño(año.getValue());
+					v.setKilometro(kilometro.getValue());
+					v.setCliente(c);
+					c.getVehiculos().add(v);
+
 				}
+				vehicleService.updateVehiculo(v);
+     			refreshGridVehiculo(clienteDTO);
+
 			} else {
 				ViewUtils.notification("Seleccionar Cliente",
 						"Debes seleccionar un cliente y luego hacer click en el boton de agregar vehiculo para agregar un nuevo vehiculo."
@@ -679,8 +690,15 @@ public class ClientsConfigView extends HorizontalLayout {
 		});
 	}
 
+	private void popUpOpened(Dialog popUp) {
+		popUp.setCloseOnEsc(true);
+		popUp.setCloseOnOutsideClick(false);
+		popUp.open();
+	}
+
 	/* Crea el PopUp y le setea algunas propiedades */
 	private void crearPopUp(Dialog pUp) {
+		popUp = new Dialog();
 		pUp.setResizable(true);
 		pUp.setCloseOnOutsideClick(false);
 		pUp.setCloseOnEsc(true);
@@ -695,24 +713,6 @@ public class ClientsConfigView extends HorizontalLayout {
 		buttonDiv.setAlignItems(Alignment.CENTER);
 		buttonDiv.setVerticalComponentAlignment(Alignment.CENTER);
 	}
-	/* Creacion de los campos del PopUp */
-	private void editor(String titulo) {
-		editorDiv = new FormLayout();
-		editorDiv.setId("editor");
-		editorDiv.setResponsiveSteps(
-				new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP),
-				new FormLayout.ResponsiveStep("600px", 1, FormLayout.ResponsiveStep.LabelsPosition.ASIDE));
-		nombre = ViewUtils.newBasicConfigTextField("Nombre");
-		apellido = ViewUtils.newBasicConfigTextField("Apellido");
-		dni = ViewUtils.newBasicConfigTextField("DNI");
-		direccion = ViewUtils.newBasicConfigTextField("Dirección");
-		telefono = ViewUtils.newBasicConfigTextField("Teléfono");
-		email = ViewUtils.newBasicConfigTextField("Email");
-		//Creacion del titulo del PopUp
-		H2 headline = new H2(titulo);
-		headline.getStyle().set("margin-top", "0");
-		editorDiv.add(headline, nombre, apellido, dni, direccion, telefono, email);
-	}
 
 	/* Este metodo carga en el PopUp todos los campos del objeto pasado como parametro*/
 	private void populateForm(ClienteDTO client) {
@@ -726,17 +726,11 @@ public class ClientsConfigView extends HorizontalLayout {
 
 	private void populateFormVehiculo(VehiculoDTO vehiculo) {
 		dominio.setValue(vehiculo.getDominio());
+		dominio.setEnabled(false);
 		marca.setValue(vehiculo.getMarca());
 		modelo.setValue(vehiculo.getModelo());
 		kilometro.setValue(vehiculo.getKilometro());
 		año.setValue(vehiculo.getAño());
-	}
-
-	/* Abre el PopUp y le setea algunas propiedades */
-	private void popUpOpened(Dialog pUp) {
-		pUp.setCloseOnEsc(true);
-		pUp.setCloseOnOutsideClick(false);
-		pUp.open();
 	}
 
 	/* Este metodo es el encargado de refrescar los datos de la grilla cada vez que se modifica, se agrega o se borrado
@@ -756,17 +750,19 @@ public class ClientsConfigView extends HorizontalLayout {
 	}
 
 	private void refreshGridVehiculo(ClienteDTO clienteDTO) {
-		List<VehiculoDTO> vehiculoDTOS = clienteDTO.getVehiculoDTOS();
-		if (vehiculoDTOS != null) {
-			dataVehiculoProvider = new ListDataProvider<>(vehiculoDTOS);
-		} else {
-			dataVehiculoProvider = new ListDataProvider<>(new ArrayList<>());
-		}
+		if(clienteDTO!=null) {
+			List<VehiculoDTO> vehiculoDTOS = clienteDTO.getVehiculoDTOS();
+			if (vehiculoDTOS != null) {
+				dataVehiculoProvider = new ListDataProvider<>(vehiculoDTOS);
+			} else {
+				dataVehiculoProvider = new ListDataProvider<>(new ArrayList<>());
+			}
 
-		vehiculoGrid.setDataProvider(dataVehiculoProvider);
-		vehiculoGrid.getDataProvider().refreshAll();
-		vehiculoGrid.select(null);
-		dataVehiculoProvider.refreshAll();
+			vehiculoGrid.setDataProvider(dataVehiculoProvider);
+			vehiculoGrid.getDataProvider().refreshAll();
+			vehiculoGrid.select(null);
+			dataVehiculoProvider.refreshAll();
+		}
 	}
 	/* Este metodo es el encargado de crear los filtros en la grilla*/
 	private void addFiltersToGrid() {
