@@ -17,10 +17,15 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.*;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.dom.Element;
+import org.apache.commons.lang3.StringUtils;
+import org.vaadin.addons.componentfactory.MaskedTextField;
+import org.vaadin.addons.componentfactory.MaskedTextFieldOption;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ViewUtils {
     public static HorizontalLayout logoLayout(String imgRoute) {
@@ -40,7 +45,7 @@ public class ViewUtils {
     }
 
     public static Notification notification(String title, String htmlMessage, NotificationVariant variant,
-                                            Notification.Position position) {
+                                            Notification.Position position, int duration) {
         Notification notification = new Notification();
         notification.getElement().getStyle().set("height", "100%");
         notification.addThemeVariants(variant);
@@ -65,6 +70,7 @@ public class ViewUtils {
         okButton.addClickShortcut(Key.ESCAPE);
         okButton.setAutofocus(true);
         notification.setPosition(position);
+        notification.setDuration(duration);
         notificationDiv.add(label);
         notificationDiv.add(okButton);
         notification.add(notificationDiv);
@@ -73,20 +79,52 @@ public class ViewUtils {
 
     public static TextField newBasicConfigTextField(String name) {
         TextField value = new TextField(name);
-        value.setWidthFull();
+       // value.setWidthFull();
         return value;
     }
+
     public static TextField newBasicConfigTextFieldUppercase(String name) {
         TextField value = new TextField(name);
         value.setClassName("uppercase");
         value.setWidthFull();
         return value;
     }
-    public static IntegerField newBasicConfigIntegerField(String name) {
-        IntegerField value = new IntegerField(name);
+
+    public static TextField newBasicConfigTextFieldMaskTel(String name) {
+        TextField value = new TextField(name);
+        value.setPattern("^[+]?[(]?[0-9]{5}[)]?[-s.]?[0-9]");
         value.setWidthFull();
         return value;
     }
+
+    public static MaskedTextField newBasicConfigMaskedTextField(String name, String mask) {
+        MaskedTextField value = new MaskedTextField(new MaskedTextFieldOption("mask",mask));
+        value.setLabel(name);
+        return value;
+    }
+
+    /**
+     * Valida la forma de una dirección de correo
+     * @param email cadena de texto con el email a validar
+     * @return
+     */
+    public static Boolean validaEmail (String email) {
+        Pattern pattern = Pattern.compile("^([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}$");
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
+
+    public static boolean emailValido(String value) {
+        return ((StringUtils.isNotBlank(value) && validaEmail(value)) || Objects.isNull(value) || (Objects.nonNull(value) && StringUtils.isBlank(value)));
+    }
+
+
+    public static IntegerField newBasicConfigIntegerField(String name) {
+        IntegerField value = new IntegerField(name);
+       // value.setWidthFull();
+        return value;
+    }
+
     public static BigDecimalField newBasicConfigBigDecimalField(String name) {
         BigDecimalField value = new BigDecimalField(name);
         value.setWidthFull();
@@ -98,6 +136,7 @@ public class ViewUtils {
         value.setWidthFull();
         return value;
     }
+
     public static PasswordField newBasicConfigPasswordField(String name) {
         PasswordField value = new PasswordField(name);
         value.setWidthFull();
@@ -107,10 +146,8 @@ public class ViewUtils {
 
     public static EmailField newBasicConfigEmailField(String name) {
         EmailField value = new EmailField(name);
-        value.setWidthFull();
-        value.setPlaceholder("Enter email...");
-        value.setErrorMessage("Please enter a valid email address.");
-        value.setInvalid(true);
+       // value.setWidthFull();
+        value.setPlaceholder("Ingrese el E-mail");
         return value;
     }
 

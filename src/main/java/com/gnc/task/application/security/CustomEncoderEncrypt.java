@@ -18,18 +18,15 @@ public class CustomEncoderEncrypt {
      * @return the encrypted string
      */
     public static String encrypt(String data) {
-            try
-            {
-                Key key = generateKey();
-                Cipher cipher = Cipher.getInstance("AES");
-                cipher.init(Cipher.ENCRYPT_MODE, key);
-                return Base64.getEncoder().encodeToString(cipher.doFinal(data.getBytes("UTF-8")));
-            }
-            catch (Exception e)
-            {
-                System.out.println("Error while encrypting: " + e.toString());
-            }
-            return null;
+        try {
+            Key key = generateKey();
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+            return Base64.getEncoder().encodeToString(cipher.doFinal(data.getBytes("UTF-8")));
+        } catch (Exception e) {
+            System.out.println("Error while encrypting: " + e.toString());
+        }
+        return null;
 
     }
 

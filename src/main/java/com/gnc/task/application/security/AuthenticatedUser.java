@@ -1,12 +1,9 @@
 package com.gnc.task.application.security;
 
-import java.util.Optional;
-
-import com.gnc.task.application.data.entity.User;
-import com.gnc.task.application.data.service.UserRepository;
+import com.gnc.task.application.mvp.model.entity.User;
+import com.gnc.task.application.mvp.model.repository.UserRepository;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +11,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 public class AuthenticatedUser {
@@ -37,7 +36,7 @@ public class AuthenticatedUser {
         logoutHandler.logout(VaadinServletRequest.getCurrent().getHttpServletRequest(), null, null);
     }
 
-    public User saveUser(User user){
+    public User saveUser(User user) {
         return userRepository.save(user);
     }
 
